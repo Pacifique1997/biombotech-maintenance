@@ -7,16 +7,40 @@ function tick() {
 tick();
 setInterval(tick, 1000);
 
-/* NOTIFY */
-function notify() {
-  const el = document.getElementById('email');
+/* NOTIFY — Formspree */
+const FORMSPREE_URL = 'https://formspree.io/f/xwvwpzvv';
+
+async function notify() {
+  const el  = document.getElementById('email');
+  const btn = document.querySelector('.form-wrap button');
+
   if (!el.value.includes('@')) {
     el.style.borderColor = 'rgba(192,21,42,0.6)';
     setTimeout(() => el.style.borderColor = '', 800);
     return;
   }
-  document.getElementById('form-wrap').style.display = 'none';
-  document.getElementById('success').style.display = 'block';
+
+  btn.textContent = '...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(FORMSPREE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ email: el.value })
+    });
+
+    if (res.ok) {
+      document.getElementById('form-wrap').style.display = 'none';
+      document.getElementById('success').style.display = 'block';
+    } else {
+      btn.textContent = 'Erreur, réessayez';
+      btn.disabled = false;
+    }
+  } catch {
+    btn.textContent = 'Erreur, réessayez';
+    btn.disabled = false;
+  }
 }
 
 /* PARTICLES */
